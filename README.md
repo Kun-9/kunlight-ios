@@ -1,24 +1,29 @@
-# Moonlight iOS/tvOS
+# KUNLIGHT (iPhone·iPad)
 
-[![CI](https://github.com/moonlight-stream/moonlight-ios/actions/workflows/ci.yml/badge.svg)](https://github.com/moonlight-stream/moonlight-ios/actions/workflows/ci.yml)
+[Moonlight iOS](https://github.com/moonlight-stream/moonlight-ios)를 고쳐 쓰는 개인 빌드입니다. [Sunshine](https://github.com/LizardByte/Sunshine)이 켜진 PC의 화면을 아이폰·아이패드로 스트리밍합니다. 맥판은 [kunlight-mac](https://github.com/Kun-9/kunlight-mac)에 있습니다.
 
-[Moonlight for iOS/tvOS](https://moonlight-stream.org) is an open source client for [Sunshine](https://github.com/LizardByte/Sunshine) and NVIDIA GameStream. Moonlight for iOS/tvOS allows you to stream your full collection of games and apps from your powerful desktop computer to your iOS device or Apple TV.
+![홈 화면](docs/home.png)
 
-Moonlight also has a [PC client](https://github.com/moonlight-stream/moonlight-qt) and [Android client](https://github.com/moonlight-stream/moonlight-android).
+## 바뀐 점
 
-Check out [the Moonlight wiki](https://github.com/moonlight-stream/moonlight-docs/wiki) for more detailed project information, setup guide, or troubleshooting steps.
+- 콘솔식 홈: 위 줄에 PC 칩, 왼쪽부터 이어지는 표지 줄, 고른 게임의 흐린 배경.
+- PC 칩과 게임은 꾹 눌러 끌면 순서가 바뀌고, 바꾼 순서는 저장됩니다.
+- 실행 중인 게임은 표지에 초록 점, 누르면 바로 이어 하기.
+- 흐린 표지를 깐 접속 중 화면.
+- 통계를 카드나 한 줄 띠로 표시(설정 > 통계 모양).
+- 설정 화면 어두운 테마, 알림 창까지 한국어, Pretendard 글꼴.
+- 맥과 맞추기(선택): `tools/kunseed.py`가 맥 KUNLIGHT의 PC 목록·페어링·순서를 저장소 밖 파일로 뽑고, 빌드 때 앱에 넣습니다. 그 파일이 없으면 이 단계는 건너뜁니다. 개인 키가 들어가니 만든 앱은 남에게 주지 마세요.
 
-[![Moonlight for iOS and tvOS](https://moonlight-stream.org/images/App_Store_Badge_135x40.svg)](https://apps.apple.com/us/app/moonlight-game-streaming/id1000551566)
+## 빌드
 
-## Building
-* Install Xcode from the [App Store page](https://apps.apple.com/us/app/xcode/id497799835)
-* Run `git clone --recursive https://github.com/moonlight-stream/moonlight-ios.git`
-  *  If you've already clone the repo without `--recursive`, run `git submodule update --init --recursive`
-* Open Moonlight.xcodeproj in Xcode
-* To run on a real device, you will need to locally modify the signing options:
-    * Click on "Moonlight" at the top of the left sidebar
-    * Click on the "Signing & Capabilities" tab
-    * Under "Targets", select "Moonlight" (for iOS/iPadOS) or "Moonlight TV" (for tvOS)
-    * In the "Team" dropdown, select your name. If your name doesn't appear, you may need to sign into Xcode with your Apple account.
-    * Change the "Bundle Identifier" to something different. You can add your name or some random letters to make it unique.
-    * Now you can select your Apple device in the top bar as a target and click the Play button to run.
+`tools/local.env`에 내 값을 적고 `tools/build-iphone.sh`를 실행합니다. 이 파일은 저장소에 올라가지 않습니다.
+
+    KUNLIGHT_TEAM=<Apple 팀 id>
+    KUNLIGHT_BUNDLE_ID=<번들 id>
+    KUNLIGHT_DEVICE=<기기 id>
+
+무료 Apple 계정이면 7일마다 다시 설치해야 합니다. 원본 빌드 방법은 [README.moonlight.md](README.moonlight.md)에 있습니다.
+
+## 라이선스
+
+원본과 같은 GPLv3입니다. 글꼴 Pretendard 는 SIL Open Font License(`Limelight/Font/Pretendard/Pretendard-LICENSE.txt`)를 따릅니다.
