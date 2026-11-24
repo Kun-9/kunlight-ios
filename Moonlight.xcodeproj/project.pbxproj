@@ -136,6 +136,12 @@
 		FBD349621A0089F6002D2A60 /* DataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FBD349611A0089F6002D2A60 /* DataManager.m */; };
 		FBDE86E019F7A837001C18A8 /* UIComputerView.m in Sources */ = {isa = PBXBuildFile; fileRef = FBDE86DF19F7A837001C18A8 /* UIComputerView.m */; };
 		FBDE86E619F82297001C18A8 /* UIAppView.m in Sources */ = {isa = PBXBuildFile; fileRef = FBDE86E519F82297001C18A8 /* UIAppView.m */; };
+		D0D0695CCA83238433A67C86 /* MoonHome.m in Sources */ = {isa = PBXBuildFile; fileRef = D0D0B0DBD513F3EFB940452A /* MoonHome.m */; };
+		D0D0AB5AE92CFA6099CFEE95 /* Pretendard-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = D0D09C4D869BF06758FCA60D /* Pretendard-Regular.otf */; };
+		D0D0DE11B786AE985889229A /* Pretendard-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = D0D0F43404DB07597BB5BC95 /* Pretendard-Medium.otf */; };
+		D0D0963D751C0865BAE4D483 /* Pretendard-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = D0D0FC2B857560AAA06FB111 /* Pretendard-SemiBold.otf */; };
+		D0D0ACE00DFC5802C7CBD0DB /* Pretendard-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = D0D07B3CFE3CD3AAC4DA8DC8 /* Pretendard-Bold.otf */; };
+		D0D06E6E928FF8ED27014655 /* MoonSeed.m in Sources */ = {isa = PBXBuildFile; fileRef = D0D01AF8398AA2A3417E0BDC /* MoonSeed.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -320,6 +326,14 @@
 		FBDE86DF19F7A837001C18A8 /* UIComputerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIComputerView.m; sourceTree = "<group>"; };
 		FBDE86E419F82297001C18A8 /* UIAppView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIAppView.h; sourceTree = "<group>"; };
 		FBDE86E519F82297001C18A8 /* UIAppView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIAppView.m; sourceTree = "<group>"; };
+		D0D0FCC4DAD1521C10858431 /* MoonHome.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MoonHome.h; sourceTree = "<group>"; };
+		D0D0B0DBD513F3EFB940452A /* MoonHome.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MoonHome.m; sourceTree = "<group>"; };
+		D0D09C4D869BF06758FCA60D /* Pretendard-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Font/Pretendard/Pretendard-Regular.otf; sourceTree = "<group>"; };
+		D0D0F43404DB07597BB5BC95 /* Pretendard-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Font/Pretendard/Pretendard-Medium.otf; sourceTree = "<group>"; };
+		D0D0FC2B857560AAA06FB111 /* Pretendard-SemiBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Font/Pretendard/Pretendard-SemiBold.otf; sourceTree = "<group>"; };
+		D0D07B3CFE3CD3AAC4DA8DC8 /* Pretendard-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Font/Pretendard/Pretendard-Bold.otf; sourceTree = "<group>"; };
+		D0D0C794750B460261D0AC38 /* MoonSeed.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MoonSeed.h; sourceTree = "<group>"; };
+		D0D01AF8398AA2A3417E0BDC /* MoonSeed.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MoonSeed.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -460,6 +474,14 @@
 				FBDE86DF19F7A837001C18A8 /* UIComputerView.m */,
 				FBDE86E419F82297001C18A8 /* UIAppView.h */,
 				FBDE86E519F82297001C18A8 /* UIAppView.m */,
+				D0D0C794750B460261D0AC38 /* MoonSeed.h */,
+				D0D01AF8398AA2A3417E0BDC /* MoonSeed.m */,
+				D0D0FCC4DAD1521C10858431 /* MoonHome.h */,
+				D0D0B0DBD513F3EFB940452A /* MoonHome.m */,
+				D0D09C4D869BF06758FCA60D /* Pretendard-Regular.otf */,
+				D0D0F43404DB07597BB5BC95 /* Pretendard-Medium.otf */,
+				D0D0FC2B857560AAA06FB111 /* Pretendard-SemiBold.otf */,
+				D0D07B3CFE3CD3AAC4DA8DC8 /* Pretendard-Bold.otf */,
 				FB290E7819B37D81004C83CF /* iPad.storyboard */,
 				FB290E7A19B38036004C83CF /* iPhone.storyboard */,
 				FB89463719F6473800339C8A /* Launch Screen.xib */,
@@ -716,6 +738,7 @@
 				FB290CEA19B2C406004C83CF /* Sources */,
 				FB290CEB19B2C406004C83CF /* Frameworks */,
 				FB290CEC19B2C406004C83CF /* Resources */,
+				D0D0F3775E03D5FBA61DAA13 /* Bundle KUNLIGHT seed */,
 			);
 			buildRules = (
 			);
@@ -822,10 +845,32 @@
 				FB290E7B19B38036004C83CF /* iPhone.storyboard in Resources */,
 				FB290D0919B2C406004C83CF /* Images.xcassets in Resources */,
 				FB89463819F6473800339C8A /* Launch Screen.xib in Resources */,
+				D0D0AB5AE92CFA6099CFEE95 /* Pretendard-Regular.otf in Resources */,
+				D0D0DE11B786AE985889229A /* Pretendard-Medium.otf in Resources */,
+				D0D0963D751C0865BAE4D483 /* Pretendard-SemiBold.otf in Resources */,
+				D0D0ACE00DFC5802C7CBD0DB /* Pretendard-Bold.otf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		D0D0F3775E03D5FBA61DAA13 /* Bundle KUNLIGHT seed */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Bundle KUNLIGHT seed";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Personal build: bundle the seed made by tools/kunseed.py (never committed)\nSEED=\"$HOME/.kunlight/ios-seed/kunseed.json\"\nDEST=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/kunseed.json\"\nif [ -f \"$SEED\" ]; then cp \"$SEED\" \"$DEST\"; else rm -f \"$DEST\"; fi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		FB1A674F2132419700507771 /* Sources */ = {
@@ -894,6 +939,8 @@
 				FB9AFD401A7E127D00872C98 /* AppListResponse.m in Sources */,
 				FB89463419F646E200339C8A /* Utils.m in Sources */,
 				FBDE86E619F82297001C18A8 /* UIAppView.m in Sources */,
+				D0D06E6E928FF8ED27014655 /* MoonSeed.m in Sources */,
+				D0D0695CCA83238433A67C86 /* MoonHome.m in Sources */,
 				FB89462F19F646E200339C8A /* Connection.m in Sources */,
 				FB9AFD321A7D867C00872C98 /* AppAssetRetriever.m in Sources */,
 				FB4678FF1A565DAC00377732 /* WakeOnLanManager.m in Sources */,

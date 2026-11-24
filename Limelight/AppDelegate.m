@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import "MoonSeed.h"
 
 @implementation AppDelegate
 
@@ -23,6 +24,10 @@ static NSString* DB_NAME = @"Limelight_iOS.sqlite";
 #endif
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+#if !TARGET_OS_TV
+    // Personal build: start with the Mac's PCs and pairing
+    [MoonSeed applyIfNeeded];
+#endif
 #if !TARGET_OS_TV
     UIApplicationShortcutItem* shortcut = [launchOptions valueForKey:UIApplicationLaunchOptionsShortcutItemKey];
     if (shortcut != nil) {

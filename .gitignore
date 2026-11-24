@@ -4,3 +4,8 @@
 .DS_Store
 Build
 DerivedData
+build/
+build.log
+build-sim/
+build-sim.log
+tools/local.env

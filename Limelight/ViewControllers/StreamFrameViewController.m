@@ -7,6 +7,7 @@
 //
 
 #import "StreamFrameViewController.h"
+#import "MoonHome.h"
 #import "MainFrameViewController.h"
 #import "VideoDecoderRenderer.h"
 #import "StreamManager.h"
@@ -43,6 +44,7 @@
     UILabel *_stageLabel;
     UILabel *_tipLabel;
     UIActivityIndicatorView *_spinner;
+    UIView *_moonStart;
     StreamView *_streamView;
     UIScrollView *_scrollView;
     BOOL _userIsInteracting;
@@ -209,6 +211,16 @@
     [self.view addSubview:_stageLabel];
     [self.view addSubview:_spinner];
     [self.view addSubview:_tipLabel];
+#if !TARGET_OS_TV
+    // Personal build: cover-and-blur start screen; the stock labels stay as the source of state
+    _moonStart = [MoonHome streamStartViewWithFrame:self.view.bounds appName:self.streamConfig.appName];
+    [self.view addSubview:_moonStart];
+    [self.view bringSubviewToFront:_spinner];
+    _spinner.center = CGPointMake(self.view.bounds.size.width / 2,
+                                  [_moonStart viewWithTag:1].frame.origin.y - 22);
+    _stageLabel.hidden = YES;
+    _tipLabel.hidden = YES;
+#endif
 }
 
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
@@ -262,6 +274,16 @@
 }
 
 - (void)updateOverlayText:(NSString*)text {
+#if !TARGET_OS_TV
+    // Personal build: stats as a card or strip, warnings in Korean
+    if (_statsUpdateTimer != nil) {
+        [MoonStats showText:text inView:self.view];
+        return;
+    }
+    if (text != nil) {
+        text = [MoonStats korean:text];
+    }
+#endif
     if (_overlayView == nil) {
         _overlayView = [[UITextView alloc] init];
 #if !TARGET_OS_TV
@@ -306,6 +328,9 @@
 }
 
 - (void) returnToMainFrame {
+#if !TARGET_OS_TV
+    [MoonStats reset];
+#endif
     // Reset display mode back to default
     [self updatePreferredDisplayMode:NO];
     
@@ -374,6 +399,7 @@
         // the first frame of video.
         self->_stageLabel.hidden = YES;
         self->_tipLabel.hidden = YES;
+        [self->_moonStart removeFromSuperview];
         
         [self->_streamView showOnScreenControls];
         
@@ -476,6 +502,7 @@
         NSString* lowerCase = [NSString stringWithFormat:@"%s in progress...", stageName];
         NSString* titleCase = [[[lowerCase substringToIndex:1] uppercaseString] stringByAppendingString:[lowerCase substringFromIndex:1]];
         [self->_stageLabel setText:titleCase];
+        ((UILabel*)[self->_moonStart viewWithTag:2]).text = [MoonHome stageText:stageName];
         [self->_stageLabel sizeToFit];
         self->_stageLabel.center = CGPointMake(self.view.frame.size.width / 2, self->_stageLabel.center.y);
     });

@@ -7,6 +7,7 @@
 //
 
 #import "SettingsViewController.h"
+#import "MoonHome.h"
 #import "TemporarySettings.h"
 #import "DataManager.h"
 
@@ -20,7 +21,7 @@
 
 @dynamic overrideUserInterfaceStyle;
 
-static NSString* bitrateFormat = @"Bitrate: %.1f Mbps";
+static NSString* bitrateFormat = @"비트레이트: %.1f Mbps"; // personal build: Korean
 static const int bitrateTable[] = {
     500,
     1000,
@@ -106,7 +107,8 @@ CGSize resolutionTable[RESOLUTION_TABLE_SIZE];
             // so we'll just use the presence of any safe area to indicate we should
             // pad by 20.
             if (self.view.safeAreaInsets.left >= 20 || self.view.safeAreaInsets.right >= 20) {
-                view.frame = CGRectMake(view.frame.origin.x + 20, view.frame.origin.y, view.frame.size.width, view.frame.size.height);
+                // Personal build: 48, since 20 leaves labels under the Dynamic Island in landscape
+                view.frame = CGRectMake(view.frame.origin.x + 48, view.frame.origin.y, view.frame.size.width - 28, view.frame.size.height);
             }
         }
     }
@@ -263,6 +265,12 @@ BOOL isCustomResolution(CGSize res) {
     [self.bitrateSlider addTarget:self action:@selector(bitrateSliderMoved) forControlEvents:UIControlEventValueChanged];
     [self updateBitrateText];
     [self updateResolutionDisplayViewText];
+
+#if !TARGET_OS_TV
+    // Personal build: same dark look and Korean labels as the Mac build (once; styling
+    // in a layout pass would trigger another layout pass)
+    [MoonHome styleSettingsView:self.view];
+#endif
 }
 
 - (void) touchModeChanged {

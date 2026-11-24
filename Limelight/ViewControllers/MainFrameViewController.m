@@ -26,6 +26,7 @@
 #import "TemporaryApp.h"
 #import "IdManager.h"
 #import "ConnectionHelper.h"
+#import "MoonHome.h"
 
 #if !TARGET_OS_TV
 #import "SettingsViewController.h"
@@ -53,6 +54,7 @@
     NSArray* _sortedAppList;
     NSCache* _boxArtCache;
     bool _background;
+    MoonHome* _moon; // personal build home screen (iOS)
 #if TARGET_OS_TV
     UITapGestureRecognizer* _menuRecognizer;
 #endif
@@ -303,6 +305,12 @@ static NSMutableSet* hostList;
     [self disableUpButton];
     
     [self.collectionView reloadData];
+    if (_moon != nil) {
+        _moon.apps = @[];
+        [self updateHosts];
+        [_moon reloaded];
+        return;
+    }
     [self.view addSubview:hostScrollView];
 }
 
@@ -313,6 +321,7 @@ static NSMutableSet* hostList;
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.collectionView reloadData];
+        [self->_moon reloaded];
     });
 }
 
@@ -337,6 +346,13 @@ static NSMutableSet* hostList;
     
     Log(LOG_D, @"Clicked host: %@", host.name);
     _selectedHost = host;
+    if (_moon != nil) {
+        _moon.apps = @[];
+        _sortedAppList = nil;
+        [self.collectionView reloadData];
+        [self updateHosts];
+        [_moon reloaded];
+    }
     [self updateTitle];
     [self enableUpButton];
     [self disableNavigation];
@@ -602,6 +618,9 @@ static NSMutableSet* hostList;
 }
 
 - (void) prepareToStreamApp:(TemporaryApp *)app {
+#if !TARGET_OS_TV
+    MoonHome.pendingArt = [MoonHome artForApp:app cache:_boxArtCache];
+#endif
     _streamConfig = [[StreamConfiguration alloc] init];
     _streamConfig.host = app.host.activeAddress;
     _streamConfig.httpsPort = app.host.httpsPort;
@@ -852,7 +871,12 @@ static NSMutableSet* hostList;
     }
 #endif
     
-    if ([self findRunningApp:app.host]) {
+    TemporaryApp* running = [self findRunningApp:app.host];
+    if (running != nil && _moon != nil) {
+        // Personal build: resume whatever is running instead of asking
+        [self prepareToStreamApp:running];
+        [self performSegueWithIdentifier:@"createStreamFrame" sender:nil];
+    } else if (running != nil) {
         // If there's a running app, display a menu
         [self appLongClicked:app view:view];
     } else {
@@ -997,14 +1021,115 @@ static NSMutableSet* hostList;
     [self retrieveSavedHosts];
     _discMan = [[DiscoveryManager alloc] initWithHosts:[hostList allObjects] andCallback:self];
         
+#if !TARGET_OS_TV
+    [self installMoonHome];
+#endif
+
     if ([hostList count] == 1) {
         [self hostClicked:[hostList anyObject] view:nil];
     }
     else {
         [self updateTitle];
-        [self.view addSubview:hostScrollView];
+        if (_moon == nil) {
+            [self.view addSubview:hostScrollView];
+        }
+        [self updateHosts];
     }
 }
+
+#if !TARGET_OS_TV
+- (void)installMoonHome {
+    __weak MainFrameViewController* weakSelf = self;
+    _moon = [[MoonHome alloc] initWithCollectionView:self.collectionView
+                                      navigationItem:self.navigationItem
+                                               cache:_boxArtCache
+                                              onPick:^(TemporaryHost* host, UIView* view) {
+        [weakSelf hostClicked:host view:view];
+    } onMenu:^(TemporaryApp* app, UIView* view) {
+        [weakSelf appLongClicked:app view:view];
+    } onAdd:^{
+        [weakSelf addHostClicked];
+    }];
+    _settingsButton.image = [UIImage systemImageNamed:@"gearshape"];
+    _settingsButton.title = nil;
+    if (@available(iOS 26.0, *)) {
+        _settingsButton.hidesSharedBackground = YES;
+    }
+    self.navigationController.overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
+    self.navigationController.navigationBar.tintColor = UIColor.whiteColor;
+    // Let the carousel and its backdrop run under the see-through bar
+    self.navigationController.navigationBar.translucent = YES;
+    UINavigationBar* navBar = self.navigationController.navigationBar;
+    navBar.standardAppearance = self.navigationItem.standardAppearance;
+    navBar.scrollEdgeAppearance = self.navigationItem.scrollEdgeAppearance;
+    navBar.compactAppearance = self.navigationItem.compactAppearance;
+    navBar.compactScrollEdgeAppearance = self.navigationItem.compactScrollEdgeAppearance;
+    navBar.barTintColor = nil;
+    navBar.backgroundColor = UIColor.clearColor;
+    self.navigationController.view.backgroundColor = MoonHome.bgTop;
+    self.edgesForExtendedLayout = UIRectEdgeAll;
+    self.extendedLayoutIncludesOpaqueBars = YES;
+
+#if DEBUG
+    // Simulator testing: SIMCTL_CHILD_MOON_TEST_HOST=<address> adds that PC at launch
+    // SIMCTL_CHILD_MOON_TEST_STATS=0|1 draws the stats card / strip with sample numbers
+    NSString* testStats = NSProcessInfo.processInfo.environment[@"MOON_TEST_STATS"];
+    if (testStats.length > 0) {
+        [NSUserDefaults.standardUserDefaults setInteger:testStats.integerValue forKey:@"statsStyle"];
+        __block int n = 0;
+        [NSTimer scheduledTimerWithTimeInterval:0.3 repeats:YES block:^(NSTimer* t) {
+            n++;
+            NSString* sample = [NSString stringWithFormat:@"Video stream: 1920x1080 59.94 FPS (Codec: HEVC)\nFrames dropped by your network connection: 0.00%%\nAverage network latency: %d ms (variance: 2 ms)\nHost processing latency min/max/avg: 1.0/3.2/1.8 ms", 6 + (n * 7) % 5];
+            [MoonStats showText:sample inView:self.navigationController.view];
+        }];
+    }
+    NSString* testHost = NSProcessInfo.processInfo.environment[@"MOON_TEST_HOST"];
+    if (testHost.length > 0) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+            [self->_discMan discoverHost:testHost withCallback:^(TemporaryHost* host, NSString* error) {
+                if (host == nil) return;
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    @synchronized(hostList) {
+                        [hostList addObject:host];
+                    }
+                    [self updateHosts];
+                });
+            }];
+        });
+    }
+#endif
+}
+
+- (BOOL)collectionView:(UICollectionView *)collectionView canMoveItemAtIndexPath:(NSIndexPath *)indexPath {
+    return _moon != nil;
+}
+
+- (void)collectionView:(UICollectionView *)collectionView moveItemAtIndexPath:(NSIndexPath *)from toIndexPath:(NSIndexPath *)to {
+    NSMutableArray* list = [_sortedAppList mutableCopy];
+    TemporaryApp* app = list[from.item];
+    [list removeObjectAtIndex:from.item];
+    [list insertObject:app atIndex:to.item];
+    _sortedAppList = list;
+    _moon.apps = list;
+    if (_selectedHost != nil) {
+        // Save the full order, hidden apps included, so they keep their place
+        NSMutableArray* full = [list mutableCopy];
+        for (TemporaryApp* a in [_moon orderedApps:[_selectedHost.appList allObjects] forHost:_selectedHost]) {
+            if (![full containsObject:a]) [full addObject:a];
+        }
+        [_moon saveAppOrder:full forHost:_selectedHost];
+    }
+    [_moon reloaded];
+}
+
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.item != [_moon currentIndex]) {
+        [_moon scrollToIndex:indexPath.item animated:YES];
+        return;
+    }
+    [self appClicked:_sortedAppList[indexPath.item] view:[collectionView cellForItemAtIndexPath:indexPath]];
+}
+#endif
 
 #if TARGET_OS_TV
 -(void)handleCollectionViewLongPress:(UILongPressGestureRecognizer *)gestureRecognizer
@@ -1255,6 +1380,22 @@ static NSMutableSet* hostList;
     
     [hostScrollView addSubview:addComp];
     [hostScrollView setContentSize:CGSizeMake(prevEdge + addComp.frame.size.width, hostScrollView.frame.size.height)];
+
+    if (_moon != nil) {
+        NSArray* hosts;
+        @synchronized (hostList) {
+            hosts = [hostList allObjects];
+        }
+        [_moon setHosts:hosts selected:_selectedHost];
+        if (_selectedHost == nil) {
+            for (TemporaryHost* h in [_moon orderedHosts:hosts]) {
+                if (h.state == StateOnline && h.pairState == PairStatePaired) {
+                    [self hostClicked:h view:self.collectionView];
+                    break;
+                }
+            }
+        }
+    }
 }
 
 - (float) getCompViewX:(UIComputerView*)comp addComp:(UIComputerView*)addComp prevEdge:(float)prevEdge {
@@ -1328,6 +1469,9 @@ static NSMutableSet* hostList;
     
     _sortedAppList = [host.appList allObjects];
     _sortedAppList = [_sortedAppList sortedArrayUsingSelector:@selector(compareName:)];
+    if (_moon != nil) {
+        _sortedAppList = [_moon orderedApps:_sortedAppList forHost:host];
+    }
     
     if (!_showHiddenApps) {
         NSMutableArray* visibleAppList = [NSMutableArray array];
@@ -1341,12 +1485,20 @@ static NSMutableSet* hostList;
     
     [hostScrollView removeFromSuperview];
     [self.collectionView reloadData];
+    if (_moon != nil) {
+        _moon.apps = _sortedAppList;
+        [_moon reloaded];
+    }
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     UICollectionViewCell* cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"AppCell" forIndexPath:indexPath];
     
     TemporaryApp* app = _sortedAppList[indexPath.row];
+    if (_moon != nil) {
+        [MoonHome configureCell:cell app:app cache:_boxArtCache];
+        return cell;
+    }
     UIAppView* appView = [[UIAppView alloc] initWithApp:app cache:_boxArtCache andCallback:self];
     
     if (appView.bounds.size.width > 10.0) {
